@@ -25,12 +25,12 @@ TArray<FVector> FVertexSensor::GetVertexArray()
 	{
 		if (UStaticMeshComponent* StaticMeshComponent = Cast<UStaticMeshComponent>(MeshComponent))
 		{
-			TArray<FVector> ComponentVertexArray = UVisionBPLib::StaticMeshComponentGetVertexArray(StaticMeshComponent);
+			TArray<FVector3f> ComponentVertexArray = UVisionBPLib::StaticMeshComponentGetVertexArray(StaticMeshComponent);
 			VertexArray.Append(ComponentVertexArray);
 		}
 		if (USkinnedMeshComponent* SkinnedMeshComponent = Cast<USkinnedMeshComponent>(MeshComponent))
 		{
-			TArray<FVector> ComponentVertexArray = UVisionBPLib::SkinnedMeshComponentGetVertexArray(SkinnedMeshComponent);
+			TArray<FVector3f> ComponentVertexArray = UVisionBPLib::SkinnedMeshComponentGetVertexArray(SkinnedMeshComponent);
 			VertexArray.Append(ComponentVertexArray);
 		}
 	}

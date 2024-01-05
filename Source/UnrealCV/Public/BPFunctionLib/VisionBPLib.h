@@ -100,13 +100,13 @@ public:
 	*/
 
 	UFUNCTION(BlueprintPure, Category = "unrealcv")
-	static TArray<FVector> SkinnedMeshComponentGetVertexArray(USkinnedMeshComponent* Component);
+	static TArray<FVector3f> SkinnedMeshComponentGetVertexArray(USkinnedMeshComponent* Component);
 
 	UFUNCTION(BlueprintPure, Category = "unrealcv")
-	static TArray<FVector> StaticMeshComponentGetVertexArray(UStaticMeshComponent* StaticMeshComponent);
+	static TArray<FVector3f> StaticMeshComponentGetVertexArray(UStaticMeshComponent* StaticMeshComponent);
 
 	UFUNCTION(BlueprintPure, Category = "unrealcv")
-	static TArray<FVector> GetVertexArrayFromMeshComponent(UMeshComponent* MeshComponent);
+	static TArray<FVector3f> GetVertexArrayFromMeshComponent(UMeshComponent* MeshComponent);
 
 	UFUNCTION(BlueprintPure, Category = "unrealcv")
 	static UFusionCamSensor* GetPlayerSensor();

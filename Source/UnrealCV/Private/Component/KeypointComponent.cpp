@@ -53,13 +53,13 @@ void UKeypointComponent::MatchNearestVertex()
 		for (UActorComponent* Component : MeshComponents)
 		{
 			UMeshComponent* MeshComponent = Cast<UMeshComponent>(Component);
-			TArray<FVector> VertexArray = UVisionBPLib::GetVertexArrayFromMeshComponent(MeshComponent);
+			TArray<FVector3f> VertexArray = UVisionBPLib::GetVertexArrayFromMeshComponent(MeshComponent);
 
 			double MinDistance = 10e10;
 			int VertexIndex = -1;
 			for (int i = 0; i < VertexArray.Num(); i++)
 			{
-				FVector Vertex = VertexArray[i];
+				FVector3d Vertex = static_cast<FVector3d>(VertexArray[i]);
 				FVector VertexWorld = MeshComponent->GetComponentRotation().RotateVector(Vertex) + MeshComponent->GetComponentLocation() - OwnerActor->GetActorLocation();
 				// Change from component space to world space
 				double Distance = FVector::Distance(VertexWorld, Keypoint.Location);
@@ -227,7 +227,7 @@ void UKeypointComponent::GetKeypoints(
 			}
 
 			UMeshComponent* MeshComponent = VertexInfo.MeshComponent;
-			TArray<FVector> VertexArray = UVisionBPLib::GetVertexArrayFromMeshComponent(MeshComponent);
+			TArray<FVector3f> VertexArray = UVisionBPLib::GetVertexArrayFromMeshComponent(MeshComponent);
 			if (VertexInfo.VertexIndex < 0 || VertexInfo.VertexIndex >= VertexArray.Num())
 			{
 				UE_LOG(LogUnrealCV, Warning, TEXT("Unexpected error in the MatchedVertexInfo"));
@@ -237,12 +237,12 @@ void UKeypointComponent::GetKeypoints(
 			KeypointNames.Add(VertexInfo.KeypointName);
 			if (bWorldSpace == false)
 			{
-				FVector VertexLocation = VertexArray[VertexInfo.VertexIndex];
+				FVector VertexLocation = static_cast<FVector>(VertexArray[VertexInfo.VertexIndex]);
 				Locations.Add(VertexLocation);
 			}
 			else
 			{
-				FVector VertexLocation = VertexArray[VertexInfo.VertexIndex];
+				FVector VertexLocation = static_cast<FVector>(VertexArray[VertexInfo.VertexIndex]);
 				FVector WorldPointLocation = MeshComponent->GetComponentRotation().RotateVector(VertexLocation) + MeshComponent->GetComponentLocation(); // in world space
 				Locations.Add(WorldPointLocation);
 			}

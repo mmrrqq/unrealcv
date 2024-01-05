@@ -326,13 +326,13 @@ FPrimitiveSceneProxy* UAnnotationComponent::CreateSceneProxy(UStaticMeshComponen
 
 	UMaterialInterface* ProxyMaterial = AnnotationMID; // Material Instance Dynamic
 	UStaticMesh* ParentStaticMesh = StaticMeshComponent->GetStaticMesh();
-	if(ParentStaticMesh == NULL
-		|| ParentStaticMesh->RenderData == NULL
-		|| ParentStaticMesh->RenderData->LODResources.Num() == 0)
+	if(ParentStaticMesh == nullptr
+		|| ParentStaticMesh->GetRenderData() == nullptr
+		|| ParentStaticMesh->GetRenderData()->LODResources.Num() == 0)
 		// || StaticMesh->RenderData->LODResources[0].VertexBuffer.GetNumVertices() == 0)
 	{
 		// UE_LOG(LogTemp, Warning, TEXT("%s, ParentStaticMesh is invalid."), *StaticMeshComponent->GetName());
-		return NULL;
+		return nullptr;
 	}
 
 	// FPrimitiveSceneProxy* Proxy = ::new FStaticMeshSceneProxy(OwnerComponent, false);

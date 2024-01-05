@@ -355,15 +355,16 @@ FString UnixStringFromBinaryArray(const TArray<uint8>& BinaryArray)
 
 void UnixBinaryArrayFromString(const FString& Message, TArray<uint8>& OutBinaryArray)
 {
-	FTCHARToUTF8 Convert(*Message);
+	// FTCHARToUTF8 Convert(*Message);
 
 	OutBinaryArray.Empty();
+	StringToBytes(Message, &OutBinaryArray[0], Message.Len());
 
 	// const TArray<TCHAR>& CharArray = Message.GetCharArray();
 	// OutBinaryArray.Append(CharArray);
 	// This can work, but will add tailing \0 also behavior is not well defined.
 
-	OutBinaryArray.Append((UTF8CHAR*)Convert.Get(), Convert.Length());
+	// OutBinaryArray.Append((UTF8CHAR*)Convert.Get(), Convert.Length());
 }
 
 

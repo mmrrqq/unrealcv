@@ -252,12 +252,12 @@ void UVisionBPLib::AnnotateWorld()
 }
 */
 
-TArray<FVector> UVisionBPLib::SkinnedMeshComponentGetVertexArray(USkinnedMeshComponent* Component)
+TArray<FVector3f> UVisionBPLib::SkinnedMeshComponentGetVertexArray(USkinnedMeshComponent* Component)
 {
-	TArray<FVector> VertexArray;
+	TArray<FVector3f> VertexArray;
 	if (!IsValid(Component)) return VertexArray;
 
-#if ENGINE_MINOR_VERSION < 19
+#if ENGINE_MAJOR_VERSION < 5 && ENGINE_MINOR_VERSION < 19
 	Component->ComputeSkinnedPositions(VertexArray);
 #else
 	// Ref: https://github.com/EpicGames/UnrealEngine/blob/4.19/Engine/Source/Runtime/Engine/Private/PhysicsEngine/PhysAnim.cpp#L671
@@ -266,7 +266,7 @@ TArray<FVector> UVisionBPLib::SkinnedMeshComponentGetVertexArray(USkinnedMeshCom
 		return VertexArray;
 	}
 
-	TArray<FMatrix> RefToLocals;
+	TArray<FMatrix44f> RefToLocals;
 	FSkinWeightVertexBuffer& SkinWeightBuffer = *Component->GetSkinWeightBuffer(0);
 	const FSkeletalMeshLODRenderData& LODData = Component->MeshObject->GetSkeletalMeshRenderData().LODRenderData[0];
 	Component->CacheRefToLocalMatrices(RefToLocals);
@@ -292,22 +292,22 @@ TArray<FVector> UVisionBPLib::SkinnedMeshComponentGetVertexArray(USkinnedMeshCom
 }
 
 // Make sure the make the Mesh CPU accessible, otherwise the vertex location can not be read from the packaged game
-TArray<FVector> UVisionBPLib::StaticMeshComponentGetVertexArray(UStaticMeshComponent* StaticMeshComponent)
+TArray<FVector3f> UVisionBPLib::StaticMeshComponentGetVertexArray(UStaticMeshComponent* StaticMeshComponent)
 {
 	UStaticMesh* StaticMesh = StaticMeshComponent->GetStaticMesh();
-	TArray<FVector> VertexArray;
+	TArray<FVector3f> VertexArray;
 
 	if (StaticMesh)
 	{
-		uint32 NumLODLevel = StaticMesh->RenderData->LODResources.Num();
+		uint32 NumLODLevel = StaticMesh->GetRenderData()->LODResources.Num();
 		for (uint32 LODIndex = 0; LODIndex < NumLODLevel; LODIndex++)
 		{
-			FStaticMeshLODResources& LODModel = StaticMesh->RenderData->LODResources[LODIndex];
+			FStaticMeshLODResources& LODModel = StaticMesh->GetRenderData()->LODResources[LODIndex];
 			FStaticMeshComponentLODInfo* InstanceMeshLODInfo = NULL;
 
 			uint32 NumVertices = LODModel.GetNumVertices();
 
-#if ENGINE_MINOR_VERSION < 19
+#if ENGINE_MAJOR_VERSION < 5 && ENGINE_MINOR_VERSION < 19
 			FPositionVertexBuffer& PositionVertexBuffer = LODModel.PositionVertexBuffer;
 #else
 			FStaticMeshVertexBuffers& StaticMeshVertexBuffers = LODModel.VertexBuffers;
@@ -316,7 +316,7 @@ TArray<FVector> UVisionBPLib::StaticMeshComponentGetVertexArray(UStaticMeshCompo
 
 			for (uint32 VertexIndex = 0; VertexIndex < PositionVertexBuffer.GetNumVertices(); VertexIndex++)
 			{
-				FVector Position = PositionVertexBuffer.VertexPosition(VertexIndex);
+				FVector3f Position = PositionVertexBuffer.VertexPosition(VertexIndex);
 				VertexArray.Add(Position);
 			}
 
@@ -331,9 +331,9 @@ TArray<FVector> UVisionBPLib::StaticMeshComponentGetVertexArray(UStaticMeshCompo
 	return VertexArray;
 }
 
-TArray<FVector> UVisionBPLib::GetVertexArrayFromMeshComponent(UMeshComponent* MeshComponent)
+TArray<FVector3f> UVisionBPLib::GetVertexArrayFromMeshComponent(UMeshComponent* MeshComponent)
 {
-	TArray<FVector> VertexArray;
+	TArray<FVector3f> VertexArray;
 	if (UStaticMeshComponent* StaticMeshComponent = Cast<UStaticMeshComponent>(MeshComponent))
 	{
 		VertexArray = UVisionBPLib::StaticMeshComponentGetVertexArray(StaticMeshComponent);
