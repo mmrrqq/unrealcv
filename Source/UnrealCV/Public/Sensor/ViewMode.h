@@ -16,7 +16,7 @@ public:
 	static void BufferVisualization(FEngineShowFlags& ShowFlags);
 
 	/** ViewMode for object instance mask */
-	static void VertexColor(FEngineShowFlags& ShowFlags);
+	static void VertexColor(UGameViewportClient* Viewport);
 
 	/** ViewMode for ground truth types implemented with PostProcess material */
 	static void PostProcess(FEngineShowFlags& ShowFlags);

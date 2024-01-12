@@ -30,9 +30,13 @@ void FUnrealcvServer::Tick(float DeltaTime)
 void FUnrealcvServer::InitWorldController()
 {
 	UWorld* GameWorld = GetGameWorld();
+	// if (!IsValid(GameWorld) || WorldController.IsValid())
+	// {
+	// 	UE_LOG(LogTemp, Error, TEXT("Requirements not set.."));
+	// }
 	if (IsValid(GameWorld) && !WorldController.IsValid())
 	{
-		UE_LOG(LogTemp, Display, TEXT("FUnrealcvServer::Tick Create WorldController"));
+		UE_LOG(LogTemp, Error, TEXT("FUnrealcvServer::Tick Create WorldController"));
 		this->WorldController = Cast<AUnrealcvWorldController>(GameWorld->SpawnActor(AUnrealcvWorldController::StaticClass()));
 		// if (IsValid(this->WorldController))
 		if (this->WorldController != nullptr)
@@ -111,20 +115,24 @@ FUnrealcvServer::~FUnrealcvServer()
  */
 UWorld* FUnrealcvServer::GetWorld()
 {
+	UE_LOG(LogUnrealCV, Warning, TEXT("In Get World"));
 	UWorld* WorldPtr = nullptr;
 #if WITH_EDITOR
-	UEditorEngine* EditorEngine = Cast<UEditorEngine>(GEngine);
-	if (IsValid(EditorEngine))
+	// UEditorEngine* GEditor = Cast<UGEditor>(GEngine);
+	if (IsValid(GEditor))
 	{
-		if (EditorEngine->GetPIEWorldContext() != nullptr)
+		if (GEditor->GetPIEWorldContext() != nullptr)
 		{
-			WorldPtr = EditorEngine->GetPIEWorldContext()->World();
+			WorldPtr = GEditor->GetPIEWorldContext()->World();
 		}
 		else
 		{
-			WorldPtr = EditorEngine->GetEditorWorldContext().World();
+			WorldPtr = GEditor->GetEditorWorldContext().World();
 		}
-	} // else game mode in editor
+	} else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("invalid GEditor reference"));
+	}// else game mode in editor
 #else
 	UGameEngine* GameEngine = Cast<UGameEngine>(GEngine);
 	if (IsValid(GameEngine))
@@ -154,20 +162,24 @@ UWorld* FUnrealcvServer::GetGameWorld()
 	UWorld* World = nullptr;
 	// The correct way to get GameWorld;
 #if WITH_EDITOR
-	UEditorEngine* EditorEngine = Cast<UEditorEngine>(GEngine);
-	if (EditorEngine != nullptr)
-	{
-		World = EditorEngine->PlayWorld;
-		if (IsValid(World) && World->IsGameWorld())
-		{
-			return World;
-		}
-		else
-		{
-			// UE_LOG(LogUnrealCV, Error, TEXT("Can not get PlayWorld from EditorEngine"));
-			return nullptr;
-		}
-	}
+	FWorldContext* WorldContext = GEngine->GetWorldContextFromGameViewport(GEngine->GameViewport);
+
+	World = WorldContext->World();
+	return World;
+	// UEditorEngine* EditorEngine = Cast<UEditorEngine>(GEngine);
+	// if (EditorEngine != nullptr)
+	// {
+	// 	World = EditorEngine->PlayWorld;
+	// 	if (IsValid(World) && World->IsGameWorld())
+	// 	{
+	// 		return World;
+	// 	}
+	// 	else
+	// 	{
+	// 		// UE_LOG(LogUnrealCV, Error, TEXT("Can not get PlayWorld from EditorEngine"));
+	// 		return nullptr;
+	// 	}
+	// }
 #endif
 
 	UGameEngine* GameEngine = Cast<UGameEngine>(GEngine);

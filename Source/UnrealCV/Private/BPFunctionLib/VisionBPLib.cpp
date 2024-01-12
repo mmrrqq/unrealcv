@@ -138,7 +138,7 @@ void UVisionBPLib::SaveNpy(const TArray<float>& FloatData, int Width, int Height
 }
 
 void UVisionBPLib::GetBoneTransform(
-	const USkeletalMeshComponent* SkeletalMeshComponent,
+	USkeletalMeshComponent* SkeletalMeshComponent,
 	const TArray<FString>& IncludedBones,
 	TArray<FString>& BoneNames,
 	TArray<FTransform>& BoneTransforms,
@@ -164,7 +164,7 @@ void UVisionBPLib::GetBoneTransform(
 }
 
 void UVisionBPLib::GetBoneTransformJson(
-	const USkeletalMeshComponent* SkeletalMeshComponent,
+	USkeletalMeshComponent* SkeletalMeshComponent,
 	const TArray<FString>& IncludedBones,
 	TArray<FString>& BoneNames,
 	TArray<FJsonObjectBP>& BoneTransformsJson,
@@ -405,9 +405,9 @@ UTexture2D* UVisionBPLib::LoadTexture2D_FromFile(const FString& FullFilePath, EJ
 			Height = ImageWrapper->GetHeight();
 
 			//Copy!
-			void* TextureData = LoadedT2D->PlatformData->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
+			void* TextureData = LoadedT2D->GetPlatformData()->Mips[0].BulkData.Lock(LOCK_READ_WRITE);
 			FMemory::Memcpy(TextureData, UncompressedBGRA.GetData(), UncompressedBGRA.Num());
-			LoadedT2D->PlatformData->Mips[0].BulkData.Unlock();
+			LoadedT2D->GetPlatformData()->Mips[0].BulkData.Unlock();
 
 			//Update!
 			LoadedT2D->UpdateResource();

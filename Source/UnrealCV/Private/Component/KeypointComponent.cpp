@@ -41,7 +41,8 @@ void UKeypointComponent::MatchNearestVertex()
 	{
 		return;
 	}
-	TArray<UActorComponent*> MeshComponents = OwnerActor->GetComponentsByClass(UMeshComponent::StaticClass());
+	TArray<UMeshComponent*> MeshComponents;
+	OwnerActor->GetComponents(MeshComponents);
 	MatchedVertexs.Empty();
 	
 	// Note: Match the keypoint in the actor space, not in the component local space
@@ -50,9 +51,8 @@ void UKeypointComponent::MatchNearestVertex()
 	for (FKeypoint& Keypoint : Keypoints)
 	{
 		FMatchedVertexInfo VertexInfo;
-		for (UActorComponent* Component : MeshComponents)
+		for (UMeshComponent* MeshComponent : MeshComponents)
 		{
-			UMeshComponent* MeshComponent = Cast<UMeshComponent>(Component);
 			TArray<FVector3f> VertexArray = UVisionBPLib::GetVertexArrayFromMeshComponent(MeshComponent);
 
 			double MinDistance = 10e10;

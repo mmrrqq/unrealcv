@@ -20,6 +20,11 @@ AUnrealcvWorldController::AUnrealcvWorldController(const FObjectInitializer& Obj
 void AUnrealcvWorldController::AttachPawnSensor()
 {
 	APlayerController* PlayerController = GetWorld()->GetFirstPlayerController();
+	if (!IsValid(PlayerController))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No available PlayerController to mount a PawnSensor"));
+		return;
+	}
 	check(PlayerController);
 	APawn* Pawn = PlayerController->GetPawn();
 	FUnrealcvServer& Server = FUnrealcvServer::Get();
@@ -31,7 +36,7 @@ void AUnrealcvWorldController::AttachPawnSensor()
 
 	UE_LOG(LogUnrealCV, Display, TEXT("Attach a UnrealcvSensor to the pawn"));
 	// Make sure this is the first one.
-	UPawnCamSensor* PawnCamSensor = NewObject<UPawnCamSensor>(Pawn, TEXT("PawnSensor")); // Make Pawn as the owner of the component
+	PawnCamSensor = NewObject<UPawnCamSensor>(Pawn, TEXT("PawnSensor")); // Make Pawn as the owner of the component
 	// UFusionCamSensor* FusionCamSensor = ConstructObject<UFusionCamSensor>(UFusionCamSensor::StaticClass(), Pawn);
 
 	UWorld *PawnWorld = Pawn->GetWorld(), *GameWorld = FUnrealcvServer::Get().GetWorld();
@@ -52,11 +57,15 @@ void AUnrealcvWorldController::InitWorld()
 		UE_LOG(LogUnrealCV, Warning, TEXT("The tcp server is not running"));
 	}
 
-
 	ObjectAnnotator.AnnotateWorld(GetWorld());
 
-	FEngineShowFlags ShowFlags = GetWorld()->GetGameViewport()->EngineShowFlags;
-	this->PlayerViewMode->SaveGameDefault(ShowFlags);
+#if WITH_EDITOR
+	auto ActiveViewportFlags = *(GEditor->GetActiveViewport()->GetClient()->GetEngineShowFlags());
+#else
+	FEngineShowFlags ActiveViewportFlags = UnrealcvServer.GetWorld()->GetGameViewport()->EngineShowFlags;
+#endif
+
+	this->PlayerViewMode->SaveGameDefault(ActiveViewportFlags);
 
 	this->AttachPawnSensor();
 
@@ -78,6 +87,12 @@ void AUnrealcvWorldController::BeginPlay()
 {
 	UE_LOG(LogTemp, Display, TEXT("AUnrealcvWorldController::BeginPlay"));
 	Super::BeginPlay();
+
+	if (!IsValid(PawnCamSensor))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("re-init world!"))
+		InitWorld();
+	}
 }
 
 

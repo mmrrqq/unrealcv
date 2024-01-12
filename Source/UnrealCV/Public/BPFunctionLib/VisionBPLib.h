@@ -3,7 +3,7 @@
 
 #include "SerializeBPLib.h"
 #include "Runtime/Engine/Classes/Kismet/BlueprintFunctionLibrary.h"
-#include "DDSLoader.h"
+#include "DDSFile.h"
 #include "VisionBPLib.generated.h"
 
 UENUM(BlueprintType)
@@ -65,7 +65,7 @@ public:
 	// Extract SkeletalMesh bone information
 	UFUNCTION(BlueprintPure, Category = "unrealcv")
 	static void GetBoneTransform(
-		const USkeletalMeshComponent* SkeletalMeshComponent,
+		USkeletalMeshComponent* SkeletalMeshComponent,
 		const TArray<FString>& IncludedBones,
 		TArray<FString>& BoneNames,
 		TArray<FTransform>& BoneTransforms,
@@ -74,7 +74,7 @@ public:
 	// Get bone transformation and return as JsonObject array, this can make BP programming much easier
 	UFUNCTION(BlueprintPure, Category = "unrealcv")
 	static void GetBoneTransformJson(
-		const USkeletalMeshComponent* SkeletalMeshComponent,
+		USkeletalMeshComponent* SkeletalMeshComponent,
 		const TArray<FString>& IncludedBones,
 		TArray<FString>& BoneNames,
 		TArray<FJsonObjectBP>& BoneTransformsJson,

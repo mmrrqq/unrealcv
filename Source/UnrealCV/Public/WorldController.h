@@ -6,12 +6,14 @@
 
 #include "ObjectAnnotator.h"
 #include "PlayerViewMode.h"
+#include "Sensor/CameraSensor/PawnCamSensor.h"
 #include "WorldController.generated.h"
 
 UCLASS()
 class AUnrealcvWorldController : public AActor
 {
 	GENERATED_BODY()
+	UPawnCamSensor* PawnCamSensor;
 
 public:
 	FObjectAnnotator ObjectAnnotator;

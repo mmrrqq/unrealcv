@@ -11,6 +11,8 @@
 
 #include "Runtime/Engine/Public/Rendering/SkeletalMeshRenderData.h"
 // #include "SkeletalMeshRenderData.h"
+#include "SkeletalMeshSceneProxy.h"
+#include "StaticMeshSceneProxy.h"
 #include "UnrealcvLog.h"
 // Note: For UE4 < 19
 // Note: check https://github.com/unrealcv/unrealcv/blob/1369a72be8428547318d8a52ae2d63e1eb57a001/Source/UnrealCV/Private/Component/AnnotationComponent.cpp#L11

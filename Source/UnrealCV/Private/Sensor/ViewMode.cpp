@@ -96,22 +96,22 @@ void FViewMode::Wireframe(FEngineShowFlags& ShowFlags)
 }
 
 
-void FViewMode::VertexColor(FEngineShowFlags& ShowFlags)
+void FViewMode::VertexColor(UGameViewportClient* ViewportClient)
 {
-	FEngineShowFlags PreviousShowFlags(ShowFlags); // Store previous ShowFlags
-	ApplyViewMode(VMI_Lit, true, ShowFlags);
+	FEngineShowFlags PreviousShowFlags(ViewportClient->EngineShowFlags); // Store previous ShowFlags
+	ApplyViewMode(VMI_Lit, true, ViewportClient->EngineShowFlags);
 
 	// From MeshPaintEdMode.cpp:2942
-	ShowFlags.SetMaterials(false);
-	ShowFlags.SetLighting(false);
-	ShowFlags.SetBSPTriangles(true);
-	ShowFlags.SetVertexColors(true);
-	ShowFlags.SetPostProcessing(false);
-	ShowFlags.SetHMDDistortion(false);
-	ShowFlags.SetTonemapper(false); // This won't take effect here
-
-	// GVertexColorViewMode = EVertexColorViewMode::Color;
-	SetVisibility(ShowFlags, PreviousShowFlags); // Store the visibility of the scene, such as folliage and landscape.
+	ViewportClient->EngineShowFlags.SetMaterials(false);
+	ViewportClient->EngineShowFlags.SetLighting(false);
+	// ViewportClient->EngineShowFlags.SetBSPTriangles(true);
+	// ViewportClient->EngineShowFlags.SetVertexColors(true);
+	// ViewportClient->EngineShowFlags.SetPostProcessing(false);
+	// ViewportClient->EngineShowFlags.SetHMDDistortion(false);
+	// ViewportClient->EngineShowFlags.SetTonemapper(false); // This won't take effect here
+	//
+	// // GVertexColorViewMode = EVertexColorViewMode::Color;
+	SetVisibility(ViewportClient->EngineShowFlags, PreviousShowFlags); // Store the visibility of the scene, such as folliage and landscape.
 }
 
 void FViewMode::Unlit(FEngineShowFlags& ShowFlags)

@@ -149,10 +149,23 @@ void UPlayerViewMode::ClearPostProcess()
 void UPlayerViewMode::ApplyPostProcess(FString ModeName)
 {
 	UWorld* World = FUnrealcvServer::Get().GetWorld();
+#if WITH_EDITOR
+	for(FEditorViewportClient* ViewportClient : GEditor->GetAllViewportClients())
+	{
+		if (!ViewportClient)
+		{
+			continue;
+		}
+		
+		FViewMode::PostProcess(ViewportClient->EngineShowFlags);
+	}
+#else
 	UGameViewportClient* GameViewportClient = World->GetGameViewport();
-	FSceneViewport* SceneViewport = GameViewportClient->GetGameViewport();
-
 	FViewMode::PostProcess(GameViewportClient->EngineShowFlags);
+#endif
+	// this caused segsegv in editor
+	// FSceneViewport* SceneViewport = GameViewportClient->GetGameViewport();
+
 
 	UMaterial* Material = GetMaterial(ModeName);
 	APostProcessVolume* PostProcessVolume = GetPostProcessVolume();
@@ -170,9 +183,27 @@ void UPlayerViewMode::DebugMode()
 
 void UPlayerViewMode::Object()
 {
+#if WITH_EDITOR
+	UE_LOG(LogTemp, Warning, TEXT("EDITOR"))
+	// for(FEditorViewportClient* ViewportClient : GEditor->GetAllViewportClients())
+	// {
+	// 	if (!ViewportClient)
+	// 	{
+	// 		continue;
+	// 	}
+	//
+	// 	FViewMode::VertexColor(ViewportClient);
+	// }
+	// auto Viewport = GEditor->GetActiveViewport()->GetClient();
+	auto ViewportClient = GEngine->GameViewport;
+	UE_LOG(LogTemp, Warning, TEXT("world type %d"), ViewportClient->GetWorld()->WorldType);
+	FViewMode::VertexColor(ViewportClient);
+#else
+	UE_LOG(LogTemp, Warning, TEXT("NOT EDITOR"))
 	UWorld* World = FUnrealcvServer::Get().GetWorld();
-	auto Viewport = World->GetGameViewport();
-	FViewMode::VertexColor(Viewport->EngineShowFlags);
+	auto Viewport = &World->GetGameViewport();
+	FViewMode::VertexColor(Viewport);
+#endif
 	// ApplyPostProcess("object_mask");
 }
 
@@ -243,8 +274,22 @@ void UPlayerViewMode::SaveGameDefault(FEngineShowFlags ShowFlags)
 
 void UPlayerViewMode::VertexColor()
 {
+#if WITH_EDITOR
+	// for(FEditorViewportClient* ViewportClient : GEditor->GetAllViewportClients())
+	// {
+	// 	if (!ViewportClient)
+	// 	{
+	// 		continue;
+	// 	}
+	//
+	// 	FViewMode::VertexColor(ViewportClient);
+	// }
+	auto ViewportClient = GEngine->GameViewport;
+	FViewMode::VertexColor(ViewportClient);
+#else
 	auto Viewport = FUnrealcvServer::Get().GetWorld()->GetGameViewport();
-	FViewMode::VertexColor(Viewport->EngineShowFlags);
+	FViewMode::VertexColor(Viewport);
+#endif
 }
 
 void UPlayerViewMode::NoTransparency()

@@ -357,7 +357,9 @@ FExecStatus FCameraHandler::GetScreenshot(const TArray<FString>& Args)
 {
 	FString Filename = Args[0];
 
-	UWorld* World = FUnrealcvServer::Get().GetWorld();
+	UE_LOG(LogTemp, Warning, TEXT("Before getting world"));
+	const auto UnrealServer = &FUnrealcvServer::Get();
+	UWorld* World = UnrealServer->GetWorld();
 	UGameViewportClient* ViewportClient = World->GetGameViewport();
 
 	bool bScreenshotSuccessful = false;
@@ -382,7 +384,19 @@ FExecStatus FCameraHandler::GetScreenshot(const TArray<FString>& Args)
 
 FExecStatus FCameraHandler::SetPlayerViewMode(const TArray<FString>& Args)
 {
-	TWeakObjectPtr<AUnrealcvWorldController> WorldController = FUnrealcvServer::Get().WorldController;
+	const auto Server = &FUnrealcvServer::Get();
+	TWeakObjectPtr<AUnrealcvWorldController> WorldController = Server->WorldController;
+	if (WorldController == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("WorldController pointer is null"));
+		return FExecStatus::InvalidPointer;
+	}
+
+	if (WorldController->PlayerViewMode == nullptr)
+	{
+		UE_LOG(LogTemp, Error, TEXT("PlayerViewMode pointer is null"));
+		return FExecStatus::InvalidPointer;
+	}
 	return WorldController->PlayerViewMode->SetMode(Args);
 }
 
