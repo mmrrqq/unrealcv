@@ -10,11 +10,13 @@
 #include "FusionCamSensor.h"
 #include "Serialization.h"
 #include "Utils/StrFormatter.h"
+#include "Utils/UObjectUtils.h"
 #include "PlayerViewMode.h"
 #include "WorldController.h"
 #include "ImageUtil.h"
 #include "SensorBPLib.h"
 #include "FusionCameraActor.h"
+#include "ObjectHandler.h"
 
 #include "UnrealcvStats.h"
 
@@ -147,6 +149,60 @@ FExecStatus FCameraHandler::SetCameraRotation(const TArray<FString>& Args)
 	}
 	else
 	{
+		FusionCamSensor->SetSensorRotation(Rotator);
+	}
+
+	return FExecStatus::OK();
+}
+
+FExecStatus FCameraHandler::SetCameraLookAt(const TArray<FString>& Args)
+{
+	if (Args.Num() != 2) return FExecStatus::InvalidArgument; // ID, OBJECT_NAME
+	
+	FExecStatus Status = FExecStatus::OK();
+	UFusionCamSensor* FusionCamSensor = GetCamera(Args, Status);
+	FString ActorId = Args[1];
+	AActor* ObjectActor = GetActorById(FUnrealcvServer::Get().GetWorld(), ActorId);
+	if (!IsValid(FusionCamSensor))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Camera not found"));
+		return Status; 
+	}
+
+	if (!IsValid(ObjectActor))
+	{
+		return FExecStatus::Error("Object Actor not found"); 
+	}
+	
+	FVector ObjectLocation = ObjectActor->GetActorLocation();
+
+	// Note: For camera 0, we want to change the player rotation
+	if (Args[0] == "0")
+	{
+		APawn* Pawn = FUnrealcvServer::Get().GetPawn();
+		if (!IsValid(Pawn))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("The Pawn of the scene is invalid."));
+			return FExecStatus::InvalidArgument;
+		}
+		AController* Controller = Pawn->GetController();
+		if (!IsValid(Controller))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("The Controller of the Pawn is invalid."));
+			return FExecStatus::InvalidArgument;
+		}
+		FVector CamLocation = Pawn->GetActorLocation();
+		FVector FromCamToObject = ObjectLocation - CamLocation;
+		
+		FRotator Rotator = FromCamToObject.ToOrientationRotator();
+		Controller->ClientSetRotation(Rotator); // Teleport action
+	}
+	else
+	{
+		FVector CamLocation = FusionCamSensor->GetSensorLocation();
+		FVector FromCamToObject = ObjectLocation - CamLocation;
+		
+		FRotator Rotator = FromCamToObject.ToOrientationRotator();
 		FusionCamSensor->SetSensorRotation(Rotator);
 	}
 
@@ -523,6 +579,12 @@ void FCameraHandler::RegisterCommands()
 		"vset /camera/[uint]/location [float] [float] [float]",
 		FDispatcherDelegate::CreateRaw(this, &FCameraHandler::SetCameraLocation),
 		"Set sensor to location [x, y, z]"
+	);
+
+	CommandDispatcher->BindCommand(
+		"vset /camera/[uint]/look_at [str]",
+		FDispatcherDelegate::CreateRaw(this, &FCameraHandler::SetCameraLookAt),
+		"Set sensor [uint] to look at object [str]"
 	);
 
 	/** This is different from SetLocation (which is teleport) */

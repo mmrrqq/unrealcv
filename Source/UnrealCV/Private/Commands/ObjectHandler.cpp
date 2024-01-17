@@ -110,6 +110,12 @@ void FObjectHandler::RegisterCommands()
 	);
 
 	CommandDispatcher->BindCommand(
+		"vset /object/[str]/physics [uint]",
+		FDispatcherDelegate::CreateRaw(this, &FObjectHandler::SetPhysics),
+		"Set the objects physics (0 or 1)"
+	);
+
+	CommandDispatcher->BindCommand(
 		"vset /object/[str]/color [uint] [uint] [uint]",
 		FDispatcherDelegate::CreateRaw(this, &FObjectHandler::SetAnnotationColor),
 		"Set the labeling color of an object [r, g, b]"
@@ -285,6 +291,21 @@ FExecStatus FObjectHandler::SetAnnotationColor(const TArray<FString>& Args)
 	FColor AnnotationColor(R, G, B, A);
 
 	Controller.SetAnnotationColor(AnnotationColor);
+	return FExecStatus::OK();
+}
+
+FExecStatus FObjectHandler::SetPhysics(const TArray<FString>& Args)
+{
+	AActor* Actor = GetActor(Args);
+	if (!Actor) return FExecStatus::Error("Can not find object");
+	// FActorController Controller(Actor);
+
+	// ObjectName, R, G, B, A = 255
+	// The color format is RGBA
+	uint32 EnablePhysicsBooleanValue = FCString::Atoi(*Args[1]);
+	bool EnablePhysics = EnablePhysicsBooleanValue > 0;
+
+	static_cast<UPrimitiveComponent*>(Actor->GetRootComponent())->SetEnableGravity(EnablePhysics);
 	return FExecStatus::OK();
 }
 

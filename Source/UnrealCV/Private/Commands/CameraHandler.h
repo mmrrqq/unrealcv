@@ -74,4 +74,6 @@ private:
 	FExecStatus SetProjectionType(const TArray<FString>& Args);
 
 	FExecStatus SetOrthoWidth(const TArray<FString>& Args);
+	
+	FExecStatus SetCameraLookAt(const TArray<FString>& Args);
 };

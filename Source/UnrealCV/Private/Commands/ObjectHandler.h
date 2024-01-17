@@ -34,6 +34,8 @@ private:
 
 	FExecStatus GetRotation(const TArray<FString>& Args);
 
+	FExecStatus SetPhysics(const TArray<FString>& Args);
+
 	FExecStatus SetLocation(const TArray<FString>& Args);
 
 	FExecStatus SetRotation(const TArray<FString>& Args);
